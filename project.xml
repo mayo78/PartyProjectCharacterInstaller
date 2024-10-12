@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="Party Project Mod Manager" package="com.mayo78.ppmd" version="1.0.0" company="Mayo78" />
+	<app main="Main" path="Export" file="Ppmd" />
+	
+	<source path="Source" />
+	
+	<haxelib name="openfl" />
+	<haxelib name="json2object" />
+	
+	<assets path="Assets" rename="assets" />
+	<assets path="Assets/Fonts" embed='true'/>
+	
+</project>
