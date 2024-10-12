@@ -28,7 +28,12 @@ class Main extends Sprite {
 
 	var tileOffset:Float;
 
-	var canSelect = true;
+	var canSelect(default, set):Bool = true;
+
+	function set_canSelect(v:Bool) {
+		boxes.alpha = v ? 1 : .2;
+		return canSelect = v;
+	}
 
 	public function new() {
 		super();
@@ -53,17 +58,39 @@ class Main extends Sprite {
 		bgTile.blendMode = ADD;
 		addChild(bgTile);
 
+		#if debug
 		addChild(new FPS());
+		#end
 
 		var loadJsonBox = new NiceBox('Import Character(s)', false);
 		loadJsonBox.addEventListener(NiceBoxEvent.NICEBOX_CLICK, e -> {
 			if (canSelect) {
 				canSelect = false;
+				trace('importing characters but checking this first');
 				getPartyPath(_ -> {
+					trace('opening popup');
 					var popup = new FileDialog();
 					popup.onSelectMultiple.add(files -> {
-						for (file in files) 
-							onDropFile(file);
+						trace('loading files: $files');
+						function nextFile() {
+							final file = files.shift();
+							if (file == null) {
+								canSelect = true;
+								return;
+							}
+							trace('loading $file');
+							if (haxe.io.Path.extension(file) == 'json') {
+								try {
+									loadJson(file, nextFile);
+								} catch(e) {
+									trace(e);
+									nextFile();
+								}
+							} else {
+								nextFile();
+							}
+						}
+						nextFile();
 					});
 					popup.onCancel.add(() -> canSelect = true);
 					popup.browse(OPEN_MULTIPLE);
@@ -122,20 +149,23 @@ class Main extends Sprite {
 
 	function onDropFile(file:String):Void {
 		trace('file $file dropped');
-		if (canSelect) {
-			final path = new haxe.io.Path(file);
-			switch path.ext {
-				case 'json':
-					trace('loading json $file');
-					loadJson(file);
-					// File.saveContent(FileSystem.)
-					// trace();
-			}
+		if (canSelect)
+			checkFile(file);
+	}
+
+	function checkFile(file:String):Void {
+		final path = new haxe.io.Path(file);
+		switch path.ext {
+			case 'json':
+				trace('loading json $file');
+				loadJson(file);
+				// File.saveContent(FileSystem.)
+				// trace();
 		}
 	}
 
 	// loads a json
-	function loadJson(file:String):Void {
+	function loadJson(file:String, ?onComplete:Void->Void):Void {
 		final rawJson = File.getContent(file);
 		final data = parser.fromJson(rawJson);
 		for (error in parser.errors) {
@@ -194,7 +224,11 @@ class Main extends Sprite {
 				saveJson.data[7][0] = [haxe.Json.stringify(charData)]; // whys it at 7 and whys the array like this who cares
 				File.saveContent(customPath, haxe.Json.stringify(charData)); // resave the save
 				File.saveContent(savePath, haxe.Json.stringify(saveJson)); // resave the customs save
-				canSelect = true;
+				trace('finished saving data');
+				if (onComplete != null)
+					onComplete();
+				else
+					canSelect = true;
 			}, () -> { // if cancelled dispose the downloaded bitmaps
 				for (bitmap in map)
 					bitmap.dispose();

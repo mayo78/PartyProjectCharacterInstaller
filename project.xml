@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	
-	<meta title="Party Project Mod Manager" package="com.mayo78.ppmd" version="1.0.0" company="Mayo78" />
-	<app main="Main" path="Export" file="Ppmd" />
+	<meta title="Party Project Character Installer" package="com.mayo78.ppci" version="1.0.0" company="Mayo78" />
+	<app main="Main" path="Export" file="Party Project Character Installer" />
 	
 	<source path="Source" />
 	
@@ -12,4 +12,5 @@
 	<assets path="Assets" rename="assets" />
 	<assets path="Assets/Fonts" embed='true'/>
 	
+	<icon path="icon.png" />
 </project>
