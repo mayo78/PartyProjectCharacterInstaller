@@ -61,10 +61,10 @@ class Main extends Sprite {
 				canSelect = false;
 				getPartyPath(_ -> {
 					var popup = new FileDialog();
-					//popup.onSelectMultiple.add(files -> {
-					//	for (file in files) 
-					//		onDropFile(file);
-					//});
+					popup.onSelectMultiple.add(files -> {
+						for (file in files) 
+							onDropFile(file);
+					});
 					popup.onCancel.add(() -> canSelect = true);
 					popup.browse(OPEN_MULTIPLE);
 				}, () -> canSelect = true);
